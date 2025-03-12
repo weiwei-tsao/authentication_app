@@ -12,9 +12,12 @@ const Layout = ({ children }: LayoutProps) => {
       <CssBaseline />
       <Box
         sx={{
-          minHeight: '100vh',
+          height: '100vh',
+          width: '100vw',
           backgroundColor: 'background.default',
-          py: 4,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         {children}
