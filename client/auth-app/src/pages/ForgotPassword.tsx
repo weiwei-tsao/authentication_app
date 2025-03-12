@@ -39,7 +39,7 @@ const ForgotPassword = () => {
     try {
       await resetPassword(data);
       setResetSent(true);
-    } catch (_error) {
+    } catch {
       // Error is handled by the auth context
     }
   };
