@@ -45,9 +45,11 @@ const Signup = () => {
   // Clear error when component unmounts
   useEffect(() => {
     return () => {
-      clearError();
+      if (error) {
+        clearError();
+      }
     };
-  }, [clearError]);
+  }, []);
 
   const onSubmit: SubmitHandler<SignupCredentials> = async (data) => {
     await signup(data);

@@ -31,9 +31,11 @@ const ForgotPassword = () => {
   // Clear error when component unmounts
   useEffect(() => {
     return () => {
-      clearError();
+      if (error) {
+        clearError();
+      }
     };
-  }, [clearError]);
+  }, []);
 
   const onSubmit: SubmitHandler<ResetPasswordCredentials> = async (data) => {
     try {

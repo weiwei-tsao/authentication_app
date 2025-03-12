@@ -41,9 +41,11 @@ const Login = () => {
   // Clear error when component unmounts
   useEffect(() => {
     return () => {
-      clearError();
+      if (error) {
+        clearError();
+      }
     };
-  }, [clearError]);
+  }, []);
 
   const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
     await login(data);
