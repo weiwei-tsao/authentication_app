@@ -1,13 +1,15 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildGraphQLSchema } from 'graphql/graphqlSchema';
+import app from './app';
+import config from './config';
+import { createSchema } from './graphql/schema';
 
 // Setup Apollo Server
-async function setupApolloServer() {
-  const schema = await buildGraphQLSchema();
+export async function setupApolloServer() {
+  const schema = await createSchema();
 
   const server = new ApolloServer({
     schema,
-    context: ({ req, res }): Context => ({
+    context: ({ req, res }): any => ({
       req: req as any,
       res: res as any,
       user: undefined,
@@ -25,11 +27,9 @@ async function setupApolloServer() {
   });
 
   await server.start();
-  server.applyMiddleware({ app: app as any, path: '/graphql' });
+  server.applyMiddleware({ app: app, path: '/graphql' });
 
   console.log(
-    `🚀 GraphQL server ready at http://localhost:${process.env.PORT || 5001}${
-      server.graphqlPath
-    }`
+    `🚀 GraphQL server ready at http://localhost:${config.port}${server.graphqlPath}`
   );
 }
