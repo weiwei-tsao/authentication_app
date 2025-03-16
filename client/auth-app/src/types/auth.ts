@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  username: string;
 }
 
 export interface AuthState {
@@ -20,7 +20,7 @@ export interface SignupCredentials {
   email: string;
   password: string;
   confirmPassword: string;
-  name?: string;
+  username: string;
 }
 
 export interface ResetPasswordCredentials {
@@ -34,4 +34,4 @@ export interface AuthContextType {
   logout: () => void;
   resetPassword: (credentials: ResetPasswordCredentials) => Promise<void>;
   clearError: () => void;
-} 
+}

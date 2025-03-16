@@ -16,24 +16,37 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FiMail, FiLock, FiUser } from 'react-icons/fi';
-import { useAuth } from '../hooks/useAuth';
-import { SignupCredentials } from '../types/auth';
+import { useAuth } from '../../hooks/useAuth';
+import { SignupCredentials } from '../../types/auth';
+import { useRegisterMutation } from '../../generated/graphql';
 
 const Signup = () => {
   const { authState, signup, clearError } = useAuth();
-  const { isLoading, error, isAuthenticated } = authState;
+  const {
+    isLoading: authLoading,
+    error: authError,
+    isAuthenticated,
+  } = authState;
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // GraphQL mutation hook
+  const [register, { loading: registerLoading, error: registerError }] =
+    useRegisterMutation();
+
   const {
-    register,
+    register: registerForm,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm<SignupCredentials>();
 
   const password = watch('password', '');
+
+  // Combined loading and error states
+  const isLoading = authLoading || registerLoading;
+  const error = authError || (registerError ? registerError.message : null);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -52,7 +65,26 @@ const Signup = () => {
   }, []);
 
   const onSubmit: SubmitHandler<SignupCredentials> = async (data) => {
-    await signup(data);
+    try {
+      // Call GraphQL mutation
+      const response = await register({
+        variables: {
+          input: {
+            email: data.email,
+            password: data.password,
+            username: data.username,
+          },
+        },
+      });
+
+      if (response.data?.register) {
+        // If successful, call the existing signup function to update auth state
+        await signup(data);
+      }
+    } catch (err) {
+      // Error handling is done via the error state from the mutation hook
+      console.error('Registration error:', err);
+    }
   };
 
   const toggleShowPassword = () => {
@@ -100,9 +132,9 @@ const Signup = () => {
             <TextField
               margin='normal'
               fullWidth
-              id='name'
-              label='Full Name (Optional)'
-              autoComplete='name'
+              id='username'
+              label='Username'
+              autoComplete='username'
               autoFocus
               InputProps={{
                 startAdornment: (
@@ -111,7 +143,7 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
-              {...register('name')}
+              {...registerForm('username')}
             />
 
             <TextField
@@ -128,7 +160,7 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
-              {...register('email', {
+              {...registerForm('email', {
                 required: 'Email is required',
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -165,7 +197,7 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
-              {...register('password', {
+              {...registerForm('password', {
                 required: 'Password is required',
                 minLength: {
                   value: 6,
@@ -202,7 +234,7 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
-              {...register('confirmPassword', {
+              {...registerForm('confirmPassword', {
                 required: 'Please confirm your password',
                 validate: (value) =>
                   value === password || 'Passwords do not match',
