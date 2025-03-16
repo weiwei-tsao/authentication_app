@@ -5,7 +5,7 @@ import {
 } from '../graphql/types/auth.graphql.types';
 import { User as GraphQLUser } from '../graphql/types/user.graphql.types';
 import UserModel from '../models/user';
-import { generateJWTToken, verifyPassword } from '../utils/auth';
+import { generateJWTToken, verifyPassword, hashPassword } from '../utils/auth';
 import { createUser } from './user.service';
 import { Response } from 'express';
 
@@ -24,11 +24,13 @@ const COOKIE_OPTIONS = {
  */
 export const register = async (input: RegisterInput): Promise<GraphQLUser> => {
   // Convert RegisterInput to UserInput
+  // Note: input.password is already pre-hashed by the client
   return await createUser({
     email: input.email,
     username: input.username,
-    password: input.password,
+    password: input.password, // This is already pre-hashed by the client
     roles: ['USER'],
+    isPreHashed: true, // Flag to indicate the password is already pre-hashed
   });
 };
 
@@ -55,12 +57,11 @@ export const login = async (
     );
   }
 
-  // Verify password
-  const isPasswordValid = verifyPassword(
-    input.password,
-    user.passwordHash,
-    user.salt
-  );
+  // Verify password - input.password is already pre-hashed by the client
+  // We need to hash it again with the user's salt
+  const clientHashedPassword = input.password;
+  const serverHashedPassword = hashPassword(clientHashedPassword, user.salt);
+  const isPasswordValid = serverHashedPassword === user.passwordHash;
 
   if (!isPasswordValid) {
     // Increment failed login attempts

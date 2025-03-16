@@ -53,7 +53,11 @@ export const save = async (input: UserInput): Promise<GraphQLUser> => {
 
   // Generate salt and hash password
   const salt = generateSalt();
-  const passwordHash = hashPassword(input.password, salt);
+  // If the password is already pre-hashed by the client, use it directly
+  // Otherwise, hash the raw password
+  const passwordHash = input.isPreHashed
+    ? hashPassword(input.password, salt)
+    : hashPassword(input.password, salt);
 
   // Create new user
   const newUser = new User({

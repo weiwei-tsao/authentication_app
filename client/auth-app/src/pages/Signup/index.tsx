@@ -19,6 +19,7 @@ import { FiMail, FiLock, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../hooks/useAuth';
 import { SignupCredentials } from '../../types/auth';
 import { useRegisterMutation } from '../../generated/graphql';
+import { hashPassword } from '../../utils/crypto';
 
 const Signup = () => {
   const { authState, signup, clearError } = useAuth();
@@ -66,12 +67,15 @@ const Signup = () => {
 
   const onSubmit: SubmitHandler<SignupCredentials> = async (data) => {
     try {
-      // Call GraphQL mutation
+      // Hash the password before sending to the server
+      const hashedPassword = await hashPassword(data.password);
+
+      // Call GraphQL mutation with hashed password
       const response = await register({
         variables: {
           input: {
             email: data.email,
-            password: data.password,
+            password: hashedPassword,
             username: data.username,
           },
         },
@@ -79,7 +83,11 @@ const Signup = () => {
 
       if (response.data?.register) {
         // If successful, call the existing signup function to update auth state
-        await signup(data);
+        // Also use hashed password here
+        await signup({
+          ...data,
+          password: hashedPassword,
+        });
       }
     } catch (err) {
       // Error handling is done via the error state from the mutation hook

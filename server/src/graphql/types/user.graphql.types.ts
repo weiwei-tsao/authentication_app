@@ -78,4 +78,7 @@ export class UserInput {
 
   @Field(() => [String], { defaultValue: ['USER'] })
   roles?: string[];
+
+  // This field is not exposed in GraphQL, it's for internal use only
+  isPreHashed?: boolean;
 }

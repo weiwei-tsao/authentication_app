@@ -18,6 +18,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FiMail, FiLock } from 'react-icons/fi';
 import { useAuth } from '../../hooks/useAuth';
 import { LoginCredentials } from '../../types/auth';
+import { hashPassword } from '../../utils/crypto';
 
 const Login = () => {
   const { authState, login, clearError } = useAuth();
@@ -51,7 +52,12 @@ const Login = () => {
   const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
     try {
       setLoginError(null);
-      await login(data);
+      // Hash the password before sending to the server
+      const hashedPassword = await hashPassword(data.password);
+      await login({
+        email: data.email,
+        password: hashedPassword,
+      });
     } catch (error) {
       setLoginError(
         error instanceof Error
