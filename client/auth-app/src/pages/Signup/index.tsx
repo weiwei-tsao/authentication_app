@@ -131,6 +131,7 @@ const Signup = () => {
           >
             <TextField
               margin='normal'
+              required
               fullWidth
               id='username'
               label='Username'
@@ -143,7 +144,11 @@ const Signup = () => {
                   </InputAdornment>
                 ),
               }}
-              {...registerForm('username')}
+              {...registerForm('username', {
+                required: 'Username is required',
+              })}
+              error={!!errors.username}
+              helperText={errors.username?.message}
             />
 
             <TextField
