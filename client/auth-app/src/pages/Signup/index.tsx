@@ -18,7 +18,6 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FiMail, FiLock, FiUser } from 'react-icons/fi';
 import { useAuth } from '../../hooks/useAuth';
 import { SignupCredentials } from '../../types/auth';
-import { useRegisterMutation } from '../../generated/graphql';
 import { hashPassword } from '../../utils/crypto';
 
 const Signup = () => {
@@ -32,10 +31,6 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // GraphQL mutation hook
-  const [register, { loading: registerLoading, error: registerError }] =
-    useRegisterMutation();
-
   const {
     register: registerForm,
     handleSubmit,
@@ -45,9 +40,9 @@ const Signup = () => {
 
   const password = watch('password', '');
 
-  // Combined loading and error states
-  const isLoading = authLoading || registerLoading;
-  const error = authError || (registerError ? registerError.message : null);
+  // Combined loading state
+  const isLoading = authLoading;
+  const error = authError;
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -70,27 +65,12 @@ const Signup = () => {
       // Hash the password before sending to the server
       const hashedPassword = await hashPassword(data.password);
 
-      // Call GraphQL mutation with hashed password
-      const response = await register({
-        variables: {
-          input: {
-            email: data.email,
-            password: hashedPassword,
-            username: data.username,
-          },
-        },
+      // Call the signup function from useAuth with hashed password
+      await signup({
+        ...data,
+        password: hashedPassword,
       });
-
-      if (response.data?.register) {
-        // If successful, call the existing signup function to update auth state
-        // Also use hashed password here
-        await signup({
-          ...data,
-          password: hashedPassword,
-        });
-      }
     } catch (err) {
-      // Error handling is done via the error state from the mutation hook
       console.error('Registration error:', err);
     }
   };
