@@ -23,17 +23,18 @@ export const hashPassword = (password: string, salt: string): string => {
 /**
  * Verify a password against a hash and salt
  * @param {string} password - The plain text password to verify
- * @param {string} hash - The stored hash
+ * @param {string} storedHash - The stored hash
  * @param {string} salt - The salt used for hashing
  * @returns {boolean} True if the password matches, false otherwise
  */
 export const verifyPassword = (
   password: string,
-  hash: string,
+  storedHash: string,
   salt: string
 ): boolean => {
+  // Hash the password with our salt
   const passwordHash = hashPassword(password, salt);
-  return passwordHash === hash;
+  return passwordHash === storedHash;
 };
 
 /**
@@ -54,4 +55,23 @@ export const generateJWTToken = (userId: string, email: string): string => {
   return jwt.sign({ userId, email }, config.jwtSecret as jwt.Secret, {
     expiresIn: Number(config.jwtExpiry) * 60 * 1000, // Convert minutes to milliseconds
   });
+};
+
+/**
+ * Verify a JWT token
+ * @param {string} token - The JWT token to verify
+ * @returns {object | null} The decoded token payload or null if invalid
+ */
+export const verifyJWTToken = (
+  token: string
+): { userId: string; email: string } | null => {
+  try {
+    const decoded = jwt.verify(token, config.jwtSecret as jwt.Secret) as {
+      userId: string;
+      email: string;
+    };
+    return decoded;
+  } catch (error) {
+    return null;
+  }
 };

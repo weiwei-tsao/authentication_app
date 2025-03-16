@@ -16,6 +16,9 @@ import {
 import { authReducer, initialState } from './authReducer';
 import { authService } from '../services/auth/authService';
 import { useLoginMutation, useRegisterMutation } from '../generated/graphql';
+import { apolloClient } from '../services/apolloClient';
+// We'll use this import again when we implement client-side hashing
+// import { hashPassword } from '../utils/crypto';
 
 // Create context
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -33,22 +36,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
   const initialCheckDone = useRef(false);
 
-  // Check if user is already logged in (from localStorage)
+  // Check if user is already logged in by making a query to the server
   useEffect(() => {
     // Only run this effect once to prevent infinite loops
     if (!initialCheckDone.current) {
-      const storedToken = localStorage.getItem('authToken');
-      const storedUser = localStorage.getItem('user');
-      if (storedToken && storedUser) {
+      const checkAuthStatus = async () => {
         try {
-          const user = JSON.parse(storedUser);
-          dispatch({ type: 'LOGIN_SUCCESS', payload: user });
-        } catch {
-          // If there's an error parsing the stored user, remove it
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('user');
+          // Use a direct query to check if the user is authenticated
+          const { data } = await apolloClient.query({
+            query: authService.ME_QUERY,
+            fetchPolicy: 'network-only', // Don't use cache for this critical auth check
+          });
+
+          if (data?.me) {
+            // If we get a valid user response, the user is authenticated
+            dispatch({ type: 'LOGIN_SUCCESS', payload: data.me });
+          }
+        } catch (error) {
+          // If there's an error, the user is not authenticated
+          console.error('Authentication check failed:', error);
         }
-      }
+      };
+
+      checkAuthStatus();
       initialCheckDone.current = true;
     }
   }, []);
@@ -58,17 +68,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     async (credentials: LoginCredentials) => {
       dispatch({ type: 'LOGIN_REQUEST' });
       try {
+        // We'll implement client-side hashing in a future update
+        // const hashedPassword = await hashPassword(credentials.password);
+
         const response = await loginMutation({
           variables: {
             input: {
               email: credentials.email,
-              password: credentials.password,
+              password: credentials.password, // Send the original password for now
             },
           },
         });
 
         if (response.data?.login) {
-          const { user, token } = response.data.login;
+          const { user } = response.data.login;
 
           // Create a user object that matches our User type
           const authUser = {
@@ -82,8 +95,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             lastPasswordChange: null, // Set a default value
           };
 
-          localStorage.setItem('authToken', token);
-          localStorage.setItem('user', JSON.stringify(authUser));
+          // We no longer store the token in localStorage
+          // The token is now stored in an HTTP-only cookie by the server
           dispatch({ type: 'LOGIN_SUCCESS', payload: authUser });
         } else {
           throw new Error('Login failed');
@@ -106,18 +119,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     async (credentials: SignupCredentials) => {
       dispatch({ type: 'SIGNUP_REQUEST' });
       try {
+        // We'll implement client-side hashing in a future update
+        // const hashedPassword = await hashPassword(credentials.password);
+
         const response = await registerMutation({
           variables: {
             input: {
               email: credentials.email,
-              password: credentials.password,
               username: credentials.username,
+              password: credentials.password, // Send the original password for now
             },
           },
         });
 
         if (response.data?.register) {
-          // After registration, we need to login to get the token
+          // Registration successful, now login
           await login({
             email: credentials.email,
             password: credentials.password,
@@ -135,14 +151,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         });
       }
     },
-    [login, registerMutation]
+    [registerMutation, login]
   );
 
   // Logout function - memoized with useCallback
-  const logout = useCallback(() => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    dispatch({ type: 'LOGOUT' });
+  const logout = useCallback(async () => {
+    try {
+      // Call the logout mutation to clear the HTTP-only cookie
+      await apolloClient.mutate({
+        mutation: authService.LOGOUT_MUTATION,
+      });
+      dispatch({ type: 'LOGOUT' });
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still clear the local state even if the server request fails
+      dispatch({ type: 'LOGOUT' });
+    }
   }, []);
 
   // Reset password function - memoized with useCallback

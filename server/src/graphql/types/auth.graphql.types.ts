@@ -33,3 +33,13 @@ export class AuthResponse {
   @Field(() => GraphQLUser)
   user: GraphQLUser;
 }
+
+// Logout response type
+@ObjectType()
+export class LogoutResponse {
+  @Field(() => Boolean)
+  success: boolean;
+
+  @Field(() => String)
+  message: string;
+}

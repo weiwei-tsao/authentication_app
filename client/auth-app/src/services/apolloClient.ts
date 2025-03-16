@@ -1,21 +1,19 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
-// Create an HTTP link to your GraphQL server
+// Create an HTTP link to your GraphQL server with credentials included
 const httpLink = createHttpLink({
   uri: 'http://localhost:5001/graphql', // Update this with your GraphQL server URL
+  credentials: 'include', // This will send cookies with every request
 });
 
-// Add authentication headers to requests
+// Add any additional headers if needed, but we won't manually add auth tokens anymore
 const authLink = setContext((_, { headers }) => {
-  // Get the authentication token from local storage if it exists
-  const token = localStorage.getItem('token');
-
-  // Return the headers to the context so httpLink can read them
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+      // We no longer need to manually add the token here
+      // The HTTP-only cookie will be automatically included with requests
     },
   };
 });

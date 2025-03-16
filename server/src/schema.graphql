@@ -18,12 +18,19 @@ input LoginInput {
   password: String!
 }
 
+type LogoutResponse {
+  message: String!
+  success: Boolean!
+}
+
 type Mutation {
   login(input: LoginInput!): AuthResponse!
+  logout: LogoutResponse!
   register(input: RegisterInput!): User!
 }
 
 type Query {
+  me: User
   user(id: String!): User
 }
 
