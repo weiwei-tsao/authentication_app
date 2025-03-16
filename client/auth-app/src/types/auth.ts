@@ -2,6 +2,11 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  avatarUrl?: string | null;
+  isActive: boolean;
+  isVerified: boolean;
+  lastLogin: string;
+  lastPasswordChange?: string | null;
 }
 
 export interface AuthState {

@@ -1,7 +1,7 @@
 export interface RegisterInput {
   email: string;
   password: string;
-  name?: string;
+  username: string;
 }
 
 export interface LoginInput {
@@ -12,7 +12,14 @@ export interface LoginInput {
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  username: string;
+  avatarUrl: string;
+  isActive: boolean;
+  isVerified: boolean;
+  lastLogin: string;
+  lastPasswordChange: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface RegisterResponse {

@@ -16,14 +16,15 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FiMail, FiLock } from 'react-icons/fi';
-import { useAuth } from '../hooks/useAuth';
-import { LoginCredentials } from '../types/auth';
+import { useAuth } from '../../hooks/useAuth';
+import { LoginCredentials } from '../../types/auth';
 
 const Login = () => {
   const { authState, login, clearError } = useAuth();
   const { isLoading, error, isAuthenticated } = authState;
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
     register,
@@ -45,15 +46,27 @@ const Login = () => {
         clearError();
       }
     };
-  }, []);
+  }, [clearError, error]);
 
   const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
-    await login(data);
+    try {
+      setLoginError(null);
+      await login(data);
+    } catch (error) {
+      setLoginError(
+        error instanceof Error
+          ? error.message
+          : 'An error occurred during login'
+      );
+    }
   };
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
+
+  // Determine which error to show
+  const displayError = loginError || error;
 
   return (
     <Container component='main' maxWidth='xs'>
@@ -77,9 +90,9 @@ const Login = () => {
             Sign In
           </Typography>
 
-          {error && (
+          {displayError && (
             <Alert severity='error' sx={{ mb: 2 }}>
-              {error}
+              {displayError}
             </Alert>
           )}
 

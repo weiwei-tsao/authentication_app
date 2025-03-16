@@ -13,7 +13,12 @@ type Mutation {
 type User {
   id: ID!
   email: String!
-  username: String
+  username: String!
+  avatarUrl: String
+  isActive: Boolean!
+  isVerified: Boolean!
+  lastLogin: String!
+  lastPasswordChange: String
   createdAt: String!
   updatedAt: String!
 }

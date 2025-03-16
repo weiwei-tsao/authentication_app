@@ -30,6 +30,7 @@ export const register = async (input: RegisterInput): Promise<GraphQLUser> => {
  */
 export const login = async (input: LoginInput): Promise<AuthResponse> => {
   // Find user by email
+  console.log('input', input);
   const user = await UserModel.findOne({ email: input.email });
   if (!user) {
     throw new Error('Invalid email or password');
