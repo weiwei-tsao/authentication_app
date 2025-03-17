@@ -73,11 +73,6 @@ const userSchema = new Schema<IUserDocument>(
   }
 );
 
-// Define secondary indexes
-userSchema.index({ email: 1 }, { unique: true }); // 1 for ascending, -1 for descending
-userSchema.index({ username: 1 }, { unique: true }); // 1 for ascending, -1 for descending
-userSchema.index({ isActive: 1 });
-
 // Virtual
 // For Profile reference
 userSchema.virtual('profile', {
