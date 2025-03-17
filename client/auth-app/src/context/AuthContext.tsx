@@ -15,7 +15,10 @@ import {
 } from '../types/auth';
 import { authReducer, initialState } from './authReducer';
 import { authService } from '../services/auth/authService';
-import { useLoginMutation, useRegisterMutation } from '../generated/graphql';
+import {
+  useLoginMutation,
+  useRegisterMutation,
+} from '../graphql/generated/auth';
 import { apolloClient } from '../services/apolloClient';
 // We'll use this import again when we implement client-side hashing
 // import { hashPassword } from '../utils/crypto';

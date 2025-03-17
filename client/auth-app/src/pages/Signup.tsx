@@ -16,9 +16,9 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { FiMail, FiLock, FiUser } from 'react-icons/fi';
-import { useAuth } from '../../hooks/useAuth';
-import { SignupCredentials } from '../../types/auth';
-import { hashPassword } from '../../utils/crypto';
+import { useAuth } from '../hooks/useAuth';
+import { SignupCredentials } from '../types/auth';
+import { hashPassword } from '../utils/crypto';
 
 const Signup = () => {
   const { authState, signup, clearError } = useAuth();

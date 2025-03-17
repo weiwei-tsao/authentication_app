@@ -2,10 +2,10 @@ import { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   // Use a local schema file instead of a remote server
-  schema: './src/types/schema.graphql',
-  documents: ['src/**/*.graphql'],
+  schema: './src/graphql/schema.graphql',
+  documents: ['src/graphql/documents/**/*.graphql'],
   generates: {
-    './src/generated/graphql.ts': {
+    './src/graphql/generated/types.ts': {
       plugins: [
         'typescript',
         'typescript-operations',
