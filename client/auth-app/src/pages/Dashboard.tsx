@@ -55,7 +55,7 @@ const Dashboard = () => {
               <FiUser />
             </Avatar>
             <Typography component='h1' variant='h4'>
-              Welcome, {user.name || user.email}
+              Welcome, {user.username || user.email}
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
             <Button
