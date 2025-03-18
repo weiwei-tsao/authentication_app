@@ -1,6 +1,6 @@
 # Authentication App
 
-A modern React TypeScript application with authentication features built using Vite, Material UI, React Hook Form, and React Router.
+A modern React TypeScript application with authentication features built using Vite, Material UI, React Hook Form, and Apollo Client for GraphQL integration.
 
 ## Features
 
@@ -9,17 +9,21 @@ A modern React TypeScript application with authentication features built using V
 - Protected routes
 - Responsive design with Material UI
 - Form validation with React Hook Form
-- State management with Context API and useReducer
+- State management with Apollo Client cache, Context API and useReducer
+- Type-safe GraphQL operations with codegen
+- Modern development setup with Vite
 
 ## Tech Stack
 
 - **React**: A JavaScript library for building user interfaces
 - **TypeScript**: Typed JavaScript for better developer experience
 - **Vite**: Next generation frontend tooling
+- **Apollo Client**: Powerful GraphQL client with caching
 - **Material UI (MUI)**: React components for faster and easier web development
 - **React Hook Form**: Performant, flexible and extensible forms with easy-to-use validation
 - **React Router**: Declarative routing for React
 - **React Icons**: Popular icons in your React projects
+- **GraphQL Codegen**: Automatic type generation for GraphQL operations
 
 ## Project Structure
 
@@ -32,8 +36,8 @@ src/
 ├── context/        # React context for state management
 ├── hooks/          # Custom React hooks
 ├── pages/          # Page components
-├── services/       # API services
-├── types/          # TypeScript type definitions
+├── graphql/        # GraphQL queries, mutations, and generated types
+├── types/          # Additional TypeScript type definitions
 └── utils/          # Utility functions
 ```
 
@@ -41,7 +45,7 @@ src/
 
 ### Prerequisites
 
-- Node.js (v14 or later)
+- Node.js (v16 or later)
 - npm or yarn
 
 ### Installation
@@ -50,12 +54,21 @@ src/
 2. Install dependencies:
 
 ```bash
+cd client/auth-app
 npm install
 # or
 yarn
 ```
 
-3. Start the development server:
+3. Generate GraphQL types:
+
+```bash
+npm run codegen
+# or
+yarn codegen
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
@@ -63,21 +76,33 @@ npm run dev
 yarn dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+5. Open your browser and navigate to `http://localhost:5173`
 
-## Test Credentials
+## Available Scripts
 
-For testing purposes, you can use the following credentials:
+- `npm run dev`: Start development server and generate GraphQL types
+- `npm run build`: Build for production
+- `npm run preview`: Preview production build
+- `npm run lint`: Run ESLint
+- `npm run codegen`: Generate GraphQL types
 
-- Email: test@example.com
-- Password: password
+## GraphQL Integration
 
-## Backend Integration
+The application uses Apollo Client for GraphQL integration. The setup includes:
 
-The application is designed to work with a GraphQL backend. Currently, it uses mock data for testing purposes. To connect to a real backend:
+- Automatic type generation for queries and mutations
+- Apollo Client cache for state management
+- Type-safe GraphQL operations
+- Optimistic UI updates
+- Error handling and loading states
 
-1. Update the API service functions in the `src/services` directory
-2. Replace the mock authentication logic in the `AuthContext.tsx` file
+## Environment Variables
+
+Create a `.env` file with:
+
+```
+VITE_GRAPHQL_URL=http://localhost:4000/graphql
+```
 
 ## License
 
