@@ -45,12 +45,12 @@ jobs:
           cd server
           npm run build
 
-    # Add test steps when you have tests
-    # - name: Run Tests
-    #   run: |
-    #     npm test
-    #     cd client/auth-app && npm test
-    #     cd ../../server && npm test
+      # Add test steps when you have tests
+      # - name: Run Tests
+      #   run: |
+      #     npm test
+      #     cd client/auth-app && npm test
+      #     cd ../../server && npm test
 
     # Add deployment steps based on your deployment target
     # Example for deploying to a cloud provider:
