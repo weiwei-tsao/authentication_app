@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          cd client/auth-app && npm install
+          cd ../../server && npm install
+
+      - name: Lint Client
+        run: |
+          cd client/auth-app
+          npm run lint
+
+      - name: Lint Server
+        run: |
+          cd server
+          npx eslint .
+
+      - name: Build Client
+        run: |
+          cd client/auth-app
+          npm run build
+
+      - name: Build Server
+        run: |
+          cd server
+          npm run build
+
+    # Add test steps when you have tests
+    # - name: Run Tests
+    #   run: |
+    #     npm test
+    #     cd client/auth-app && npm test
+    #     cd ../../server && npm test
+
+    # Add deployment steps based on your deployment target
+    # Example for deploying to a cloud provider:
+    # - name: Deploy
+    #   if: github.ref == 'refs/heads/main'
+    #   run: |
+    #     # Add your deployment commands here
+    #     # For example, deploying to Heroku, AWS, etc.
