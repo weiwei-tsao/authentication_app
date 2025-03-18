@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 
 // Create an HTTP link to your GraphQL server with credentials included
 const httpLink = createHttpLink({
-  uri: 'http://localhost:5001/graphql', // Update this with your GraphQL server URL
+  uri: import.meta.env.VITE_API_URL,
   credentials: 'include', // This will send cookies with every request
 });
 
